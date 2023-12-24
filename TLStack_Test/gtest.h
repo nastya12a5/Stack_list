@@ -2675,11 +2675,11 @@ template <typename T>
 class ThreadLocal {
  public:
   ThreadLocal() : value_() {}
-  explicit ThreadLocal(const T& val) : value_(val) {}
+  explicit ThreadLocal(const T& value) : value_(value) {}
   T* pointer() { return &value_; }
   const T* pointer() const { return &value_; }
   const T& get() const { return value_; }
-  void set(const T& val) { value_ = val; }
+  void set(const T& value) { value_ = value; }
  private:
   T value_;
 };
@@ -2719,9 +2719,9 @@ GTEST_API_ size_t GetThreadCount();
 template <bool bool_value>
 struct bool_constant {
   typedef bool_constant<bool_value> type;
-  static const bool val = bool_value;
+  static const bool value = bool_value;
 };
-template <bool bool_value> const bool bool_constant<bool_value>::val;
+template <bool bool_value> const bool bool_constant<bool_value>::value;
 
 typedef bool_constant<false> false_type;
 typedef bool_constant<true> true_type;
@@ -3042,7 +3042,7 @@ typedef TypeWithSize<8>::Int TimeInMillis;  // Represents time in milliseconds.
 // TODO(chandlerc): Find a better way to refactor flag and environment parsing
 // out of both gtest-port.cc and gtest.cc to avoid exporting this utility
 // function.
-bool ParseInt32(const Message& src_text, const char* str, Int32* val);
+bool ParseInt32(const Message& src_text, const char* str, Int32* value);
 
 // Parses a bool/Int32/string from the environment variable
 // corresponding to the given Google Test flag.
@@ -3468,13 +3468,13 @@ class GTEST_API_ String {
       const std::string& str, const std::string& suffix);
 
   // Formats an int value as "%02d".
-  static std::string FormatIntWidth2(int val);  // "%02d" for width == 2
+  static std::string FormatIntWidth2(int value);  // "%02d" for width == 2
 
   // Formats an int value as "%X".
-  static std::string FormatHexInt(int val);
+  static std::string FormatHexInt(int value);
 
   // Formats a byte as "%02X".
-  static std::string FormatByte(unsigned char val);
+  static std::string FormatByte(unsigned char value);
 
  private:
   String();  // Not meant to be instantiated.
@@ -7050,7 +7050,7 @@ class TestPartResult;                  // Result of a test part.
 class UnitTest;                        // A collection of test cases.
 
 template <typename T>
-::std::string PrintToString(const T& val);
+::std::string PrintToString(const T& value);
 
 namespace internal {
 
@@ -7625,9 +7625,9 @@ inline bool AlwaysFalse() { return !AlwaysTrue(); }
 // variable declared in a conditional expression always being NULL in
 // the else branch.
 struct GTEST_API_ ConstCharPtr {
-  ConstCharPtr(const char* str) : val(str) {}
+  ConstCharPtr(const char* str) : value(str) {}
   operator bool() const { return true; }
-  const char* val;
+  const char* value;
 };
 
 // A simple Linear Congruential Generator for generating random
@@ -7771,7 +7771,7 @@ class ImplicitlyConvertible {
 # pragma warning(push)          // Saves the current warning state.
 # pragma warning(disable:4244)  // Temporarily disables warning 4244.
 
-  static const bool val =
+  static const bool value =
       sizeof(Helper(ImplicitlyConvertible::MakeFrom())) == 1;
 # pragma warning(pop)           // Restores the warning state.
 #elif defined(__BORLANDC__)
@@ -7785,7 +7785,7 @@ class ImplicitlyConvertible {
 #endif  // _MSV_VER
 };
 template <typename From, typename To>
-const bool ImplicitlyConvertible<From, To>::val;
+const bool ImplicitlyConvertible<From, To>::value;
 
 // IsAProtocolMessage<T>::value is a compile-time bool constant that's
 // true iff T is type ProtocolMessage, proto2::Message, or a subclass
@@ -7793,8 +7793,8 @@ const bool ImplicitlyConvertible<From, To>::val;
 template <typename T>
 struct IsAProtocolMessage
     : public bool_constant<
-  ImplicitlyConvertible<const T*, const ::ProtocolMessage*>::val ||
-  ImplicitlyConvertible<const T*, const ::proto2::Message*>::val> {
+  ImplicitlyConvertible<const T*, const ::ProtocolMessage*>::value ||
+  ImplicitlyConvertible<const T*, const ::proto2::Message*>::value> {
 };
 
 // When the compiler sees expression IsContainerTest<C>(0), if C is an
@@ -8016,20 +8016,20 @@ class NativeArray {
       gtest_caught_expected = true; \
     } \
     catch (...) { \
-      gtest_msg.val = \
+      gtest_msg.value = \
           "Expected: " #statement " throws an exception of type " \
           #expected_exception ".\n  Actual: it throws a different type."; \
       goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__); \
     } \
     if (!gtest_caught_expected) { \
-      gtest_msg.val = \
+      gtest_msg.value = \
           "Expected: " #statement " throws an exception of type " \
           #expected_exception ".\n  Actual: it throws nothing."; \
       goto GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__); \
     } \
   } else \
     GTEST_CONCAT_TOKEN_(gtest_label_testthrow_, __LINE__): \
-      fail(gtest_msg.val)
+      fail(gtest_msg.value)
 
 #define GTEST_TEST_NO_THROW_(statement, fail) \
   GTEST_AMBIGUOUS_ELSE_BLOCKER_ \
@@ -9325,9 +9325,9 @@ template <typename T, TypeKind kTypeKind>
 class TypeWithoutFormatter {
  public:
   // This default version is called when kTypeKind is kOtherType.
-  static void PrintValue(const T& val, ::std::ostream* os) {
-    PrintBytesInObjectTo(reinterpret_cast<const unsigned char*>(&val),
-                         sizeof(val), os);
+  static void PrintValue(const T& value, ::std::ostream* os) {
+    PrintBytesInObjectTo(reinterpret_cast<const unsigned char*>(&value),
+                         sizeof(value), os);
   }
 };
 
@@ -9339,11 +9339,11 @@ const size_t kProtobufOneLinerMaxLength = 50;
 template <typename T>
 class TypeWithoutFormatter<T, kProtobuf> {
  public:
-  static void PrintValue(const T& val, ::std::ostream* os) {
-    const ::testing::internal::string short_str = val.ShortDebugString();
+  static void PrintValue(const T& value, ::std::ostream* os) {
+    const ::testing::internal::string short_str = value.ShortDebugString();
     const ::testing::internal::string pretty_str =
         short_str.length() <= kProtobufOneLinerMaxLength ?
-        short_str : ("\n" + val.DebugString());
+        short_str : ("\n" + value.DebugString());
     *os << ("<" + pretty_str + ">");
   }
 };
@@ -9358,8 +9358,8 @@ class TypeWithoutFormatter<T, kConvertibleToInteger> {
   // case printing it as an integer is the desired behavior.  In case
   // T is not an enum, printing it as an integer is the best we can do
   // given that it has no user-defined printer.
-  static void PrintValue(const T& val, ::std::ostream* os) {
-    const internal::BiggestInt kBigInt = val;
+  static void PrintValue(const T& value, ::std::ostream* os) {
+    const internal::BiggestInt kBigInt = value;
     *os << kBigInt;
   }
 };
@@ -9392,8 +9392,8 @@ template <typename Char, typename CharTraits, typename T>
 ::std::basic_ostream<Char, CharTraits>& operator<<(
     ::std::basic_ostream<Char, CharTraits>& os, const T& x) {
   TypeWithoutFormatter<T,
-      (internal::IsAProtocolMessage<T>::val ? kProtobuf :
-       internal::ImplicitlyConvertible<const T&, internal::BiggestInt>::val ?
+      (internal::IsAProtocolMessage<T>::value ? kProtobuf :
+       internal::ImplicitlyConvertible<const T&, internal::BiggestInt>::value ?
        kConvertibleToInteger : kOtherType)>::PrintValue(x, &os);
   return os;
 }
@@ -9408,7 +9408,7 @@ namespace testing_internal {
 // Used to print a value that is not an STL-style container when the
 // user doesn't define PrintTo() for it.
 template <typename T>
-void DefaultPrintNonContainerTo(const T& val, ::std::ostream* os) {
+void DefaultPrintNonContainerTo(const T& value, ::std::ostream* os) {
   // With the following statement, during unqualified name lookup,
   // testing::internal2::operator<< appears as if it was declared in
   // the nearest enclosing namespace that contains both
@@ -9435,7 +9435,7 @@ void DefaultPrintNonContainerTo(const T& val, ::std::ostream* os) {
   // impossible to define #1 (e.g. when foo is ::std, defining
   // anything in it is undefined behavior unless you are a compiler
   // vendor.).
-  *os << val;
+  *os << value;
 }
 
 }  // namespace testing_internal
@@ -9454,7 +9454,7 @@ template <typename T>
 class UniversalPrinter;
 
 template <typename T>
-void UniversalPrint(const T& val, ::std::ostream* os);
+void UniversalPrint(const T& value, ::std::ostream* os);
 
 // Used to print an STL-style container when the user doesn't define
 // a PrintTo() for it.
@@ -9504,7 +9504,7 @@ void DefaultPrintTo(IsNotContainer /* dummy */,
     //
     // IsTrue() silences warnings: "Condition is always true",
     // "unreachable code".
-    if (IsTrue(ImplicitlyConvertible<T*, const void*>::val)) {
+    if (IsTrue(ImplicitlyConvertible<T*, const void*>::value)) {
       // T is not a function type.  We just call << to print p,
       // relying on ADL to pick up user-defined << for their pointer
       // types, if any.
@@ -9527,8 +9527,8 @@ void DefaultPrintTo(IsNotContainer /* dummy */,
 template <typename T>
 void DefaultPrintTo(IsNotContainer /* dummy */,
                     false_type /* is not a pointer */,
-                    const T& val, ::std::ostream* os) {
-  ::testing_internal::DefaultPrintNonContainerTo(val, os);
+                    const T& value, ::std::ostream* os) {
+  ::testing_internal::DefaultPrintNonContainerTo(value, os);
 }
 
 // Prints the given value using the << operator if it has one;
@@ -9543,7 +9543,7 @@ void DefaultPrintTo(IsNotContainer /* dummy */,
 // or there is already a << operator but it doesn't do what the user
 // wants).
 template <typename T>
-void PrintTo(const T& val, ::std::ostream* os) {
+void PrintTo(const T& value, ::std::ostream* os) {
   // DefaultPrintTo() is overloaded.  The type of its first two
   // arguments determine which version will be picked.  If T is an
   // STL-style container, the version for container will be called; if
@@ -9566,7 +9566,7 @@ void PrintTo(const T& val, ::std::ostream* os) {
   //
   //   PrintTo(const T& x, ...);
   //   PrintTo(T* x, ...);
-  DefaultPrintTo(IsContainerTest<T>(0), is_pointer<T>(), val, os);
+  DefaultPrintTo(IsContainerTest<T>(0), is_pointer<T>(), value, os);
 }
 
 // The following list of PrintTo() overloads tells
@@ -9757,13 +9757,13 @@ void PrintTo(
 
 // Overload for std::pair.
 template <typename T1, typename T2>
-void PrintTo(const ::std::pair<T1, T2>& val, ::std::ostream* os) {
+void PrintTo(const ::std::pair<T1, T2>& value, ::std::ostream* os) {
   *os << '(';
   // We cannot use UniversalPrint(value.first, os) here, as T1 may be
   // a reference type.  The same for printing value.second.
-  UniversalPrinter<T1>::Print(val.first, os);
+  UniversalPrinter<T1>::Print(value.first, os);
   *os << ", ";
-  UniversalPrinter<T2>::Print(val.second, os);
+  UniversalPrinter<T2>::Print(value.second, os);
   *os << ')';
 }
 
@@ -9782,7 +9782,7 @@ class UniversalPrinter {
   // Note: we deliberately don't call this PrintTo(), as that name
   // conflicts with ::testing::internal::PrintTo in the body of the
   // function.
-  static void Print(const T& val, ::std::ostream* os) {
+  static void Print(const T& value, ::std::ostream* os) {
     // By default, ::testing::internal::PrintTo() is used for printing
     // the value.
     //
@@ -9791,7 +9791,7 @@ class UniversalPrinter {
     // be visible here.  Since it is more specific than the generic ones
     // in ::testing::internal, it will be picked by the compiler in the
     // following statement - exactly what we want.
-    PrintTo(val, os);
+    PrintTo(value, os);
   }
 
 #ifdef _MSC_VER
@@ -9853,13 +9853,13 @@ class UniversalPrinter<T&> {
 # pragma warning(disable:4180)  // Temporarily disables warning 4180.
 #endif  // _MSC_VER
 
-  static void Print(const T& val, ::std::ostream* os) {
+  static void Print(const T& value, ::std::ostream* os) {
     // Prints the address of the value.  We use reinterpret_cast here
     // as static_cast doesn't compile when T is a function type.
-    *os << "@" << reinterpret_cast<const void*>(&val) << " ";
+    *os << "@" << reinterpret_cast<const void*>(&value) << " ";
 
     // Then prints the value itself.
-    UniversalPrint(val, os);
+    UniversalPrint(value, os);
   }
 
 #ifdef _MSC_VER
@@ -9874,22 +9874,22 @@ class UniversalPrinter<T&> {
 template <typename T>
 class UniversalTersePrinter {
  public:
-  static void Print(const T& val, ::std::ostream* os) {
-    UniversalPrint(val, os);
+  static void Print(const T& value, ::std::ostream* os) {
+    UniversalPrint(value, os);
   }
 };
 template <typename T>
 class UniversalTersePrinter<T&> {
  public:
-  static void Print(const T& val, ::std::ostream* os) {
-    UniversalPrint(val, os);
+  static void Print(const T& value, ::std::ostream* os) {
+    UniversalPrint(value, os);
   }
 };
 template <typename T, size_t N>
 class UniversalTersePrinter<T[N]> {
  public:
-  static void Print(const T (&val)[N], ::std::ostream* os) {
-    UniversalPrinter<T[N]>::Print(val, os);
+  static void Print(const T (&value)[N], ::std::ostream* os) {
+    UniversalPrinter<T[N]>::Print(value, os);
   }
 };
 template <>
@@ -9934,8 +9934,8 @@ class UniversalTersePrinter<wchar_t*> {
 };
 
 template <typename T>
-void UniversalTersePrint(const T& val, ::std::ostream* os) {
-  UniversalTersePrinter<T>::Print(val, os);
+void UniversalTersePrint(const T& value, ::std::ostream* os) {
+  UniversalTersePrinter<T>::Print(value, os);
 }
 
 // Prints a value using the type inferred by the compiler.  The
@@ -9943,11 +9943,11 @@ void UniversalTersePrint(const T& val, ::std::ostream* os) {
 // (const) char pointer, this prints both the pointer and the
 // NUL-terminated string.
 template <typename T>
-void UniversalPrint(const T& val, ::std::ostream* os) {
+void UniversalPrint(const T& value, ::std::ostream* os) {
   // A workarond for the bug in VC++ 7.1 that prevents us from instantiating
   // UniversalPrinter with T directly.
   typedef T T1;
-  UniversalPrinter<T1>::Print(val, os);
+  UniversalPrinter<T1>::Print(value, os);
 }
 
 #if GTEST_HAS_TR1_TUPLE
@@ -10018,7 +10018,7 @@ struct TuplePrefixPrinter<1> {
 template <typename T>
 void PrintTupleTo(const T& t, ::std::ostream* os) {
   *os << "(";
-  TuplePrefixPrinter< ::std::tr1::tuple_size<T>::val>::
+  TuplePrefixPrinter< ::std::tr1::tuple_size<T>::value>::
       PrintPrefixTo(t, os);
   *os << ")";
 }
@@ -10027,10 +10027,10 @@ void PrintTupleTo(const T& t, ::std::ostream* os) {
 // element for each field.  See the comment before
 // UniversalTersePrint() for how we define "tersely".
 template <typename Tuple>
-Strings UniversalTersePrintTupleFieldsToStrings(const Tuple& val) {
+Strings UniversalTersePrintTupleFieldsToStrings(const Tuple& value) {
   Strings result;
-  TuplePrefixPrinter< ::std::tr1::tuple_size<Tuple>::val>::
-      TersePrintPrefixToStrings(val, &result);
+  TuplePrefixPrinter< ::std::tr1::tuple_size<Tuple>::value>::
+      TersePrintPrefixToStrings(value, &result);
   return result;
 }
 #endif  // GTEST_HAS_TR1_TUPLE
@@ -10038,9 +10038,9 @@ Strings UniversalTersePrintTupleFieldsToStrings(const Tuple& val) {
 }  // namespace internal
 
 template <typename T>
-::std::string PrintToString(const T& val) {
+::std::string PrintToString(const T& value) {
   ::std::stringstream ss;
-  internal::UniversalTersePrinter<T>::Print(val, &ss);
+  internal::UniversalTersePrinter<T>::Print(value, &ss);
   return ss.str();
 }
 
@@ -10199,9 +10199,9 @@ class RangeGenerator : public ParamGeneratorInterface<T> {
  private:
   class Iterator : public ParamIteratorInterface<T> {
    public:
-    Iterator(const ParamGeneratorInterface<T>* base, T val, int index,
+    Iterator(const ParamGeneratorInterface<T>* base, T value, int index,
              IncrementT step)
-        : base_(base), value_(val), index_(index), step_(step) {}
+        : base_(base), value_(value), index_(index), step_(step) {}
     virtual ~Iterator() {}
 
     virtual const ParamGeneratorInterface<T>* BaseGenerator() const {
@@ -17695,8 +17695,8 @@ class GTEST_API_ AssertionResult {
   const char* failure_message() const { return message(); }
 
   // Streams a custom failure message into this object.
-  template <typename T> AssertionResult& operator<<(const T& val) {
-    AppendMessage(Message() << val);
+  template <typename T> AssertionResult& operator<<(const T& value) {
+    AppendMessage(Message() << value);
     return *this;
   }
 
@@ -17811,8 +17811,8 @@ class GTEST_API_ Test {
   // global context (before or after invocation of RUN_ALL_TESTS and from
   // SetUp/TearDown method of Environment objects registered with Google
   // Test) will be output as attributes of the <testsuites> element.
-  static void RecordProperty(const std::string& key, const std::string& val);
-  static void RecordProperty(const std::string& key, int val);
+  static void RecordProperty(const std::string& key, const std::string& value);
+  static void RecordProperty(const std::string& key, int value);
 
  protected:
   // Creates a Test object.
@@ -17891,7 +17891,7 @@ class TestProperty {
   }
 
   // Gets the user supplied value.
-  const char* val() const {
+  const char* value() const {
     return value_.c_str();
   }
 
@@ -18661,7 +18661,7 @@ class GTEST_API_ UnitTest {
   // from SetUpTestCase or TearDownTestCase, or to the global property set
   // when invoked elsewhere.  If the result already contains a property with
   // the same key, the value will be updated.
-  void RecordProperty(const std::string& key, const std::string& val);
+  void RecordProperty(const std::string& key, const std::string& value);
 
   // Gets the i-th test case among all the test cases. i can range from 0 to
   // total_test_case_count() - 1. If i is not in that range, returns NULL.
@@ -18770,8 +18770,8 @@ namespace internal {
 template <typename ToPrint, typename OtherOperand>
 class FormatForComparison {
  public:
-  static ::std::string Format(const ToPrint& val) {
-    return ::testing::PrintToString(val);
+  static ::std::string Format(const ToPrint& value) {
+    return ::testing::PrintToString(value);
   }
 };
 
@@ -18779,8 +18779,8 @@ class FormatForComparison {
 template <typename ToPrint, size_t N, typename OtherOperand>
 class FormatForComparison<ToPrint[N], OtherOperand> {
  public:
-  static ::std::string Format(const ToPrint* val) {
-    return FormatForComparison<const ToPrint*, OtherOperand>::Format(val);
+  static ::std::string Format(const ToPrint* value) {
+    return FormatForComparison<const ToPrint*, OtherOperand>::Format(value);
   }
 };
 
@@ -18791,8 +18791,8 @@ class FormatForComparison<ToPrint[N], OtherOperand> {
   template <typename OtherOperand>                                      \
   class FormatForComparison<CharType*, OtherOperand> {                  \
    public:                                                              \
-    static ::std::string Format(CharType* val) {                      \
-      return ::testing::PrintToString(static_cast<const void*>(val)); \
+    static ::std::string Format(CharType* value) {                      \
+      return ::testing::PrintToString(static_cast<const void*>(value)); \
     }                                                                   \
   }
 
@@ -18810,8 +18810,8 @@ GTEST_IMPL_FORMAT_C_STRING_AS_POINTER_(const wchar_t);
   template <>                                                           \
   class FormatForComparison<CharType*, OtherStringType> {               \
    public:                                                              \
-    static ::std::string Format(CharType* val) {                      \
-      return ::testing::PrintToString(val);                           \
+    static ::std::string Format(CharType* value) {                      \
+      return ::testing::PrintToString(value);                           \
     }                                                                   \
   }
 
@@ -18845,8 +18845,8 @@ GTEST_IMPL_FORMAT_C_STRING_AS_STRING_(const wchar_t, ::std::wstring);
 // INTERNAL IMPLEMENTATION - DO NOT USE IN A USER PROGRAM.
 template <typename T1, typename T2>
 std::string FormatForComparisonFailureMessage(
-    const T1& val, const T2& /* other_operand */) {
-  return FormatForComparison<T1, T2>::Format(val);
+    const T1& value, const T2& /* other_operand */) {
+  return FormatForComparison<T1, T2>::Format(value);
 }
 
 // The helper function for {ASSERT|EXPECT}_EQ.
@@ -18936,7 +18936,7 @@ class EqHelper<true> {
       // expands to Compare("", "", NULL, my_ptr), which requires a conversion
       // to match the Secret* in the other overload, which would otherwise make
       // this template match better.
-      typename EnableIf<!is_pointer<T2>::val>::type* = 0) {
+      typename EnableIf<!is_pointer<T2>::value>::type* = 0) {
     return CmpHelperEQ(expected_expression, actual_expression, expected,
                        actual);
   }

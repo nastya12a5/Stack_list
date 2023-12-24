@@ -529,7 +529,7 @@ GTEST_API_ std::string FormatEpochTimeInMillisAsIso8601(TimeInMillis ms);
 // On success, stores the value of the flag in *value, and returns
 // true.  On failure, returns false without changing *value.
 GTEST_API_ bool ParseInt32Flag(
-    const char* str, const char* flag, Int32* val);
+    const char* str, const char* flag, Int32* value);
 
 // Returns a random seed in range [1, kMaxRandomSeed] based on the
 // given --gtest_random_seed flag value.
@@ -1217,7 +1217,7 @@ class GTEST_API_ UnitTestImpl {
 
   // Used by UnitTest::Run() to capture the state of
   // GTEST_FLAG(catch_exceptions) at the moment it starts.
-  void set_catch_exceptions(bool val) { catch_exceptions_ = val; }
+  void set_catch_exceptions(bool value) { catch_exceptions_ = value; }
 
   // The UnitTest object that owns this implementation object.
   UnitTest* const parent_;
@@ -3117,24 +3117,24 @@ bool String::EndsWithCaseInsensitive(
 }
 
 // Formats an int value as "%02d".
-std::string String::FormatIntWidth2(int val) {
+std::string String::FormatIntWidth2(int value) {
   std::stringstream ss;
-  ss << std::setfill('0') << std::setw(2) << val;
+  ss << std::setfill('0') << std::setw(2) << value;
   return ss.str();
 }
 
 // Formats an int value as "%X".
-std::string String::FormatHexInt(int val) {
+std::string String::FormatHexInt(int value) {
   std::stringstream ss;
-  ss << std::hex << std::uppercase << val;
+  ss << std::hex << std::uppercase << value;
   return ss.str();
 }
 
 // Formats a byte as "%02X".
-std::string String::FormatByte(unsigned char val) {
+std::string String::FormatByte(unsigned char value) {
   std::stringstream ss;
   ss << std::setfill('0') << std::setw(2) << std::hex << std::uppercase
-     << static_cast<unsigned int>(val);
+     << static_cast<unsigned int>(value);
   return ss.str();
 }
 
@@ -3228,7 +3228,7 @@ void TestResult::RecordProperty(const std::string& xml_element,
     test_properties_.push_back(test_property);
     return;
   }
-  property_with_matching_key->SetValue(test_property.val());
+  property_with_matching_key->SetValue(test_property.value());
 }
 
 // The list of reserved attributes used in the <testsuites> element of XML
@@ -3394,14 +3394,14 @@ void Test::TearDown() {
 }
 
 // Allows user supplied key value pairs to be recorded for later output.
-void Test::RecordProperty(const std::string& key, const std::string& val) {
-  UnitTest::GetInstance()->RecordProperty(key, val);
+void Test::RecordProperty(const std::string& key, const std::string& value) {
+  UnitTest::GetInstance()->RecordProperty(key, value);
 }
 
 // Allows user supplied key value pairs to be recorded for later output.
-void Test::RecordProperty(const std::string& key, int val) {
+void Test::RecordProperty(const std::string& key, int value) {
   Message value_message;
-  value_message << val;
+  value_message << value;
   RecordProperty(key, value_message.GetString().c_str());
 }
 
@@ -4535,7 +4535,7 @@ class XmlUnitTestResultPrinter : public EmptyTestEventListener {
   static void OutputXmlAttribute(std::ostream* stream,
                                  const std::string& element_name,
                                  const std::string& name,
-                                 const std::string& val);
+                                 const std::string& value);
 
   // Streams an XML CDATA section, escaping invalid CDATA sequences as needed.
   static void OutputXmlCDataSection(::std::ostream* stream, const char* data);
@@ -4750,7 +4750,7 @@ void XmlUnitTestResultPrinter::OutputXmlAttribute(
     std::ostream* stream,
     const std::string& element_name,
     const std::string& name,
-    const std::string& val) {
+    const std::string& value) {
   const std::vector<std::string>& allowed_names =
       GetReservedAttributesForElement(element_name);
 
@@ -4759,7 +4759,7 @@ void XmlUnitTestResultPrinter::OutputXmlAttribute(
       << "Attribute " << name << " is not allowed for element <" << element_name
       << ">.";
 
-  *stream << " " << name << "=\"" << EscapeXmlAttribute(val) << "\"";
+  *stream << " " << name << "=\"" << EscapeXmlAttribute(value) << "\"";
 }
 
 // Prints an XML representation of a TestInfo object.
@@ -4886,7 +4886,7 @@ std::string XmlUnitTestResultPrinter::TestPropertiesAsXmlAttributes(
   for (int i = 0; i < result.test_property_count(); ++i) {
     const TestProperty& property = result.GetTestProperty(i);
     attributes << " " << property.key() << "="
-        << "\"" << EscapeXmlAttribute(property.val()) << "\"";
+        << "\"" << EscapeXmlAttribute(property.value()) << "\"";
   }
   return attributes.GetString();
 }
@@ -5326,8 +5326,8 @@ void UnitTest::AddTestPartResult(
 // when invoked elsewhere.  If the result already contains a property with
 // the same key, the value will be updated.
 void UnitTest::RecordProperty(const std::string& key,
-                              const std::string& val) {
-  impl_->RecordProperty(TestProperty(key, val));
+                              const std::string& value) {
+  impl_->RecordProperty(TestProperty(key, value));
 }
 
 // Runs all tests in this UnitTest object and prints the result.
@@ -6196,7 +6196,7 @@ const char* ParseFlagValue(const char* str,
 //
 // On success, stores the value of the flag in *value, and returns
 // true.  On failure, returns false without changing *value.
-bool ParseBoolFlag(const char* str, const char* flag, bool* val) {
+bool ParseBoolFlag(const char* str, const char* flag, bool* value) {
   // Gets the value of the flag as a string.
   const char* const value_str = ParseFlagValue(str, flag, true);
 
@@ -6204,7 +6204,7 @@ bool ParseBoolFlag(const char* str, const char* flag, bool* val) {
   if (value_str == NULL) return false;
 
   // Converts the string value to a bool.
-  *val = !(*value_str == '0' || *value_str == 'f' || *value_str == 'F');
+  *value = !(*value_str == '0' || *value_str == 'f' || *value_str == 'F');
   return true;
 }
 
@@ -6213,7 +6213,7 @@ bool ParseBoolFlag(const char* str, const char* flag, bool* val) {
 //
 // On success, stores the value of the flag in *value, and returns
 // true.  On failure, returns false without changing *value.
-bool ParseInt32Flag(const char* str, const char* flag, Int32* val) {
+bool ParseInt32Flag(const char* str, const char* flag, Int32* value) {
   // Gets the value of the flag as a string.
   const char* const value_str = ParseFlagValue(str, flag, false);
 
@@ -6222,7 +6222,7 @@ bool ParseInt32Flag(const char* str, const char* flag, Int32* val) {
 
   // Sets *value to the value of the flag.
   return ParseInt32(Message() << "The value of flag --" << flag,
-                    value_str, val);
+                    value_str, value);
 }
 
 // Parses a string for a string flag, in the form of
@@ -6230,7 +6230,7 @@ bool ParseInt32Flag(const char* str, const char* flag, Int32* val) {
 //
 // On success, stores the value of the flag in *value, and returns
 // true.  On failure, returns false without changing *value.
-bool ParseStringFlag(const char* str, const char* flag, std::string* val) {
+bool ParseStringFlag(const char* str, const char* flag, std::string* value) {
   // Gets the value of the flag as a string.
   const char* const value_str = ParseFlagValue(str, flag, false);
 
@@ -6238,7 +6238,7 @@ bool ParseStringFlag(const char* str, const char* flag, std::string* val) {
   if (value_str == NULL) return false;
 
   // Sets *value to the value of the flag.
-  *val = value_str;
+  *value = value_str;
   return true;
 }
 
@@ -8931,7 +8931,7 @@ static std::string FlagToEnvVar(const char* flag) {
 // Parses 'str' for a 32-bit signed integer.  If successful, writes
 // the result to *value and returns true; otherwise leaves *value
 // unchanged and returns false.
-bool ParseInt32(const Message& src_text, const char* str, Int32* val) {
+bool ParseInt32(const Message& src_text, const char* str, Int32* value) {
   // Parses the environment variable as a decimal integer.
   char* end = NULL;
   const long long_value = strtol(str, &end, 10);  // NOLINT
@@ -8965,7 +8965,7 @@ bool ParseInt32(const Message& src_text, const char* str, Int32* val) {
     return false;
   }
 
-  *val = result;
+  *value = result;
   return true;
 }
 
@@ -9007,8 +9007,8 @@ Int32 Int32FromGTestEnv(const char* flag, Int32 default_value) {
 // the given flag; if it's not set, returns default_value.
 const char* StringFromGTestEnv(const char* flag, const char* default_value) {
   const std::string env_var = FlagToEnvVar(flag);
-  const char* const val = posix::GetEnv(env_var.c_str());
-  return val == NULL ? default_value : val;
+  const char* const value = posix::GetEnv(env_var.c_str());
+  return value == NULL ? default_value : value;
 }
 
 }  // namespace internal

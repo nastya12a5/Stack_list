@@ -1,17 +1,17 @@
 #pragma once
 #include<iostream>
 #include<string>
-#include ""
+#include "TLStack.h"
 
 
-class TCalc
+class TLCalc
 {
 private:
-	std::string infix;                            // Инфиксная строка, подаваемая на вход
-	std::string postfix;                          // Постфиксная строка
+	std::string infix;                           
+	std::string postfix;                          
 
-	TStack<char> OpStack = TStack<char>(10);      // Стек из операций "+", "-", ")" и тд
-	TStack<double> NumStack = TStack<double>(10); // Стек из чисел из инфиксной строки
+	TLStack<char> C = TLStack<char>();      
+	TLStack<double> D = TLStack<double>(); 
 
 	int priority(char op) {
 		switch (op)
@@ -33,16 +33,16 @@ private:
 		default:
 			break;
 		}
-	}; // Метод , определяющий приоритет операций
+	}; 
 	void ToPostfix() {
-		OpStack.ClerStack();
+		C.ClerStack();
 		std::string str = '(' + infix + ')';
 
 		for (int i = 0; i < str.size(); i++)
 		{
 			if (str[i] == '(')
 			{
-				OpStack.Push('(');
+				C.Push('(');
 			}
 
 			if ((str[i] >= '0') && (str[i] <= '9'))
@@ -52,49 +52,49 @@ private:
 
 			if (str[i] == ')')
 			{
-				char OpStackElement = OpStack.Pop();
+				char OpStackElement = C.Pop();
 				while (OpStackElement != '(')
 				{
 					postfix += OpStackElement;
-					OpStackElement = OpStack.Pop();
+					OpStackElement = C.Pop();
 				}
 			}
 
 			if ((str[i] == '+') || (str[i] == '-') || (str[i] == '*') || (str[i] == '/') || (str[i] == '^'))
 			{
-				char OpStackElement = OpStack.Pop();
+				char OpStackElement = C.Pop();
 				while (priority(OpStackElement) >= priority(str[i]))
 				{
 					postfix += OpStackElement;
-					OpStackElement = OpStack.Pop();
+					OpStackElement = C.Pop();
 				}
-				OpStack.Push(OpStackElement);
-				OpStack.Push(str[i]);
+				C.Push(OpStackElement);
+				C.Push(str[i]);
 			}
 		}
-	}; // Метод перевода инфиксной строки в постфиксную
+	}; 
 
 public:
 	std::string GetInfix() { return infix; }                   // Получить инфиксную строку
 	std::string GetPostfix() { return postfix; }               // Получить инфиксную строку
 	void SetInfix(std::string _infix) { infix = _infix; }      // Записать строку в ификсную строку
 
-	TCalc(std::string _infix) :infix(_infix) { this->ToPostfix(); } // Конструктор по умолчанию
+	TLCalc(std::string _infix) :infix(_infix) { this->ToPostfix(); } // Конструктор по умолчанию
 	double CalculateWithPostfix() {
 		//this->ToPostfix();
-		NumStack.ClerStack();
+		D.ClerStack();
 
 		for (int i = 0; i < postfix.length(); i++)
 		{
 			if ((postfix[i] >= '0') && (postfix[i] <= '9'))
 			{
-				NumStack.Push(postfix[i] - '0');
+				D.Push(postfix[i] - '0');
 			}
 
 			if ((postfix[i] == '+') || (postfix[i] == '-') || (postfix[i] == '*') || (postfix[i] == '/') || (postfix[i] == '^'))
 			{
 				double x1, x2, y;
-				x1 = NumStack.Pop(); x2 = NumStack.Pop();
+				x1 = D.Pop(); x2 = D.Pop();
 				switch (postfix[i])
 				{
 				case '+':
@@ -115,19 +115,19 @@ public:
 				default:
 					break;
 				}
-				NumStack.Push(y);
+				D.Push(y);
 			}
 		}
 
-		double result = NumStack.Pop();
-		if (!NumStack.empty())
+		double result = D.Pop();
+		if (!D.empty())
 		{
 			throw "В TStack::Calculate не пустой стек при возврате result";
 		}
 		return result;
-	}; // Метод вычисления c постфиксной 
+	};  
 	double CalculateNoPostfix() {
-		OpStack.ClerStack(); NumStack.ClerStack();
+		C.ClerStack(); D.ClerStack();
 		std::string str = '(' + infix + ')';
 
 		for (int i = 0; i < str.size(); i++)
@@ -136,21 +136,21 @@ public:
 			if (str[i] == '(')
 			{   
 				flag = 1;
-				OpStack.Push('(');
+				C.Push('(');
 			}
 
 			if (str[i] == ')')
 			{
 				flag = 1;
-				if (OpStack.empty())
+				if (C.empty())
 				{
 					throw "Stack Error";
 				}
-				char element = OpStack.Pop();
+				char element = C.Pop();
 				while (element != '(')
 				{
-					double x2 = NumStack.Pop();
-					double x1 = NumStack.Pop();
+					double x2 = D.Pop();
+					double x1 = D.Pop();
 					double y;
 					switch (element)
 					{
@@ -172,12 +172,12 @@ public:
 					default:
 						break;
 					}
-					NumStack.Push(y);
-					if (OpStack.empty())
+					D.Push(y);
+					if (C.empty())
 					{
 						throw "Stack Error";
 					}
-					element = OpStack.Pop();
+					element = C.Pop();
 				}
 			}
 
@@ -185,22 +185,22 @@ public:
 			{
 				flag = 1;
 				size_t position;
-				NumStack.Push(std::stod(&str[i], &position));
+				D.Push(std::stod(&str[i], &position));
 				i += (position - 1);
 			}
 
 			if ((str[i] == '+') || (str[i] == '-') || (str[i] == '*') || (str[i] == '/') || (str[i] == '^'))
 			{
 				flag = 1;
-				if (OpStack.empty())
+				if (C.empty())
 				{
 					throw "Stack Error";
 				}
-				char OpStackElement = OpStack.Pop();
+				char OpStackElement = C.Pop();
 				while (priority(OpStackElement) >= priority(str[i]))
 				{
-					double x2 = NumStack.Pop();
-					double x1 = NumStack.Pop();
+					double x2 = D.Pop();
+					double x1 = D.Pop();
 					double y;
 					switch (OpStackElement)
 					{
@@ -222,15 +222,15 @@ public:
 					default:
 						break;
 					}
-					NumStack.Push(y);
-					if (OpStack.empty())
+					D.Push(y);
+					if (C.empty())
 					{
 						throw "Stack Error";
 					}
-					OpStackElement = OpStack.Pop();
+					OpStackElement = C.Pop();
 				}
-				OpStack.Push(OpStackElement);
-				OpStack.Push(str[i]);
+				C.Push(OpStackElement);
+				C.Push(str[i]);
 			}
 
 			if (flag == 0)
@@ -239,17 +239,17 @@ public:
 			}
 		}
 
-		double result = NumStack.Pop();
-		if (!NumStack.empty())
+		double result = D.Pop();
+		if (!D.empty())
 		{
 			throw std::exception();
 		}
-		if (!OpStack.empty())
+		if (!C.empty())
 		{
 			throw std::exception();
 		}
 		return result;
-	}; // Метод вычисления 
+	};  
 
 	
 };

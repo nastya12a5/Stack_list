@@ -10,7 +10,7 @@ TEST(TLStack, can_create_stack_with_positive_size)
 TEST(TLStack, can_get_length)
 {
     TLStack<int> st;
-    int i = st.Number_of_el();
+    int i = st.ElementsNumber();
     EXPECT_EQ(0, i);
 }
 
@@ -47,10 +47,10 @@ TEST(TLStack, throws_when_use_pop_on_empty_stack)
 }
 
 
-TEST(TLStack, throws_when_use_TOP_on_empty_stack)
+TEST(TLStack, throws_when_use_First_el_on_empty_stack)
 {
     TLStack<int> st;
-    ASSERT_ANY_THROW(st.Top());
+    ASSERT_ANY_THROW(st.First_el());
 }
 
 TEST(TLStack, return_true_when_use_Empty_on_empty_stack)
@@ -59,7 +59,7 @@ TEST(TLStack, return_true_when_use_Empty_on_empty_stack)
     bool b1 = st.empty();
     EXPECT_EQ(1, b1);
 }
-TEST(TLStack, return_false_when_use_Empty_on_not_empty_stack)
+TEST(TLStack, false_when_use_Empty_on_not_empty_stack)
 {
     TLStack<int> st;
     st.Push(1);

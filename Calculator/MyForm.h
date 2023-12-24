@@ -110,9 +110,9 @@
 				this->button2->Font = (gcnew System::Drawing::Font(L"Playbill", 12, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 					static_cast<System::Byte>(0)));
 				this->button2->ForeColor = System::Drawing::Color::Black;
-				this->button2->Location = System::Drawing::Point(338, 108);
+				this->button2->Location = System::Drawing::Point(326, 108);
 				this->button2->Name = L"button2";
-				this->button2->Size = System::Drawing::Size(120, 26);
+				this->button2->Size = System::Drawing::Size(120, 25);
 				this->button2->TabIndex = 4;
 				this->button2->Text = L"Вычислить";
 				this->button2->UseVisualStyleBackColor = true;
@@ -153,9 +153,9 @@
 			try
 			{
 				std::string infix;
-				infix = msclr::interop::marshal_as<std::string>(textBox1->Text); 
+				infix = msclr::interop::marshal_as<std::string>(textBox1->Text); //Конвертирование String^ в std::string
 				TLCalc calculator(infix);
-				double result = calculator.Calc();
+				double result = calculator.CalculateNoPostfix();
 
 				label2->Text = Convert::ToString(result);
 			}
