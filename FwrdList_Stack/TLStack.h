@@ -24,11 +24,11 @@ public:
     TLStack<T>& operator = (const TLStack& object);   // Оператор присваивания
 	bool full();                                      // Метод проверки стека на полноту
 	bool empty() { return pFirst == nullptr; }        // Метод проверки стека на пустоту        
-	void ClerStack();                                 // Метод очистки стека
+	void ClearStack();                                 // Метод очистки стека
 	T Pop();                                          // Метод получения вершины стека (c её перемещением)
 	void Push(const T element);                       // Метод добавления элемента в стек                  
 	T First_el();                                          // Метод получения значения вершины стека
-	int ElementsNumber();                             // Количесвто элементов в стеке
+	int Number_of_el();                             // Количесвто элементов в стеке
 	//void output();                                  // Метод вывода стека на экран                         
 };
 
@@ -91,7 +91,7 @@ void TLStack<T>::Push(const T element)
 }
 
 template<class T>
-inline void TLStack<T>::ClerStack()
+inline void TLStack<T>::ClearStack()
 {
 	TNode <T>* tmp = pFirst;
 	while (pFirst != nullptr)
@@ -142,7 +142,7 @@ bool TLStack<T>::full()
 }
 
 template<class T>
-int TLStack<T>::ElementsNumber()
+int TLStack<T>::Number_of_el()
 {
 	TNode<T>* p = pFirst;
 	int i = 0;

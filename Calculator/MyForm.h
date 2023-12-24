@@ -155,7 +155,7 @@
 				std::string infix;
 				infix = msclr::interop::marshal_as<std::string>(textBox1->Text); //Конвертирование String^ в std::string
 				TLCalc calculator(infix);
-				double result = calculator.CalculateNoPostfix();
+				double result = calculator.Calc();
 
 				label2->Text = Convert::ToString(result);
 			}

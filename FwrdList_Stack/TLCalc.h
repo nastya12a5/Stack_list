@@ -35,7 +35,7 @@ private:
 		}
 	}; 
 	void ToPostfix() {
-		C.ClerStack();
+		C.ClearStack();
 		std::string str = '(' + infix + ')';
 
 		for (int i = 0; i < str.size(); i++)
@@ -52,37 +52,70 @@ private:
 
 			if (str[i] == ')')
 			{
-				char OpStackElement = C.Pop();
-				while (OpStackElement != '(')
+				char OperationEl = C.Pop();
+				while (OperationEl != '(')
 				{
-					postfix += OpStackElement;
-					OpStackElement = C.Pop();
+					postfix += OperationEl;
+					OperationEl = C.Pop();
 				}
 			}
 
 			if ((str[i] == '+') || (str[i] == '-') || (str[i] == '*') || (str[i] == '/') || (str[i] == '^'))
 			{
-				char OpStackElement = C.Pop();
-				while (priority(OpStackElement) >= priority(str[i]))
+				char OperationEl = C.Pop();
+				while (priority(OperationEl) >= priority(str[i]))
 				{
-					postfix += OpStackElement;
-					OpStackElement = C.Pop();
+					postfix += OperationEl;
+					OperationEl = C.Pop();
 				}
-				C.Push(OpStackElement);
+				C.Push(OperationEl);
 				C.Push(str[i]);
 			}
 		}
 	}; 
 
 public:
-	std::string GetInfix() { return infix; }                   // Получить инфиксную строку
-	std::string GetPostfix() { return postfix; }               // Получить инфиксную строку
-	void SetInfix(std::string _infix) { infix = _infix; }      // Записать строку в ификсную строку
+	std::string GetInfix() { return infix; }                   
+	std::string GetPostfix() { return postfix; }               
+	void SetInfix(std::string _infix) { infix = _infix; }      
 
-	TLCalc(std::string _infix) :infix(_infix) { this->ToPostfix(); } // Конструктор по умолчанию
-	double CalculateWithPostfix() {
+	TLCalc(std::string _infix) :infix(_infix) { this->ToPostfix(); } 
+	bool CheckExpression()
+	{
+		
+		if (C.empty() == false)
+		{
+			this->C.ClearStack();
+		}
+		int res = 0;
+		for (int i = 0; i < infix.size(); i++)
+		{
+			if (infix[i] == '(')
+			{
+				C.Push(infix[i]);
+			}
+			if (infix[i] == ')')
+			{
+				if (!C.empty())
+				{
+					C.Pop();
+				}
+				else
+					res = 1;
+			}
+		}
+		if (!C.empty())
+			res = 1;
+		if (res == 0)
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	double CalcPostfix() {
 		//this->ToPostfix();
-		D.ClerStack();
+		D.ClearStack();
 
 		for (int i = 0; i < postfix.length(); i++)
 		{
@@ -126,8 +159,8 @@ public:
 		}
 		return result;
 	};  
-	double CalculateNoPostfix() {
-		C.ClerStack(); D.ClerStack();
+	double Calc() {
+		C.ClearStack(); D.ClearStack();
 		std::string str = '(' + infix + ')';
 
 		for (int i = 0; i < str.size(); i++)
@@ -196,13 +229,13 @@ public:
 				{
 					throw "Stack Error";
 				}
-				char OpStackElement = C.Pop();
-				while (priority(OpStackElement) >= priority(str[i]))
+				char OperationEl = C.Pop();
+				while (priority(OperationEl) >= priority(str[i]))
 				{
 					double x2 = D.Pop();
 					double x1 = D.Pop();
 					double y;
-					switch (OpStackElement)
+					switch (OperationEl)
 					{
 					case '+':
 						y = x1 + x2;
@@ -227,9 +260,9 @@ public:
 					{
 						throw "Stack Error";
 					}
-					OpStackElement = C.Pop();
+					OperationEl = C.Pop();
 				}
-				C.Push(OpStackElement);
+				C.Push(OperationEl);
 				C.Push(str[i]);
 			}
 
